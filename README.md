@@ -1,7 +1,7 @@
 <div align="center">
 
 # Poll
-## (Simple Polling web app)
+(Simple Polling web app)
 
 </div>
 
