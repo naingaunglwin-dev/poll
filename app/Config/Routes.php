@@ -15,3 +15,7 @@ $routes->group('/setup', function ($routes) {
 });
 
 $routes->get('share/(:any)', 'Vote::share/$1');
+
+$routes->group('/vote', function ($routes) {
+    $routes->post('', 'Vote::vote');
+});

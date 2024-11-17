@@ -155,4 +155,26 @@ class Vote extends BaseController
 
         return $this->view('vote/share', $data);
     }
+
+    public function vote(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        $id = $this->request->getPost('poll');
+
+        $voteCategoryModel = new PollModel();
+
+        $poll = $voteCategoryModel->find($id);
+
+        if (empty($poll)) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $updateVoteCount = $poll['vote_count'] + 1;
+
+        $voteCategoryModel->save([
+            'id' => $id,
+            'vote_count' => $updateVoteCount,
+        ]);
+
+        return redirect()->to('vote/result/' . $this->request->getPost('token'));
+    }
 }
