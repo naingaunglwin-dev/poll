@@ -9,7 +9,7 @@ use Ramsey\Uuid\Uuid;
 
 class Vote extends BaseController
 {
-    public function setup($token = 0)
+    public function setup($token = 0): string|\CodeIgniter\HTTP\RedirectResponse
     {
         $data = [];
 
@@ -132,5 +132,27 @@ class Vote extends BaseController
         $data['message'] = session()->getFlashdata('message');
 
         return $this->view('vote/setup', $data);
+    }
+
+    public function share($token): string
+    {
+        $voteModel = new VoteModel();
+
+        $vote = $voteModel->where('token', $token)->first();
+
+        if (empty($vote)) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $pollModel = new PollModel();
+
+        $poll = $pollModel->where('vote_id', $vote['id'])->findAll();
+
+        $data['poll']       = $poll;
+        $data['poll_title'] = $vote['title'];
+        $data['poll_desc']  = $vote['description'];
+        $data['token']      = $vote['token'];
+
+        return $this->view('vote/share', $data);
     }
 }
