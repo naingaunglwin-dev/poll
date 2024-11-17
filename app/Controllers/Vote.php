@@ -177,4 +177,36 @@ class Vote extends BaseController
 
         return redirect()->to('vote/result/' . $this->request->getPost('token'));
     }
+
+    public function result($token): string
+    {
+        $voteModel = new VoteModel();
+
+        $vote = $voteModel->where('token', $token)->first();
+
+        $pollModel = new PollModel();
+
+        $poll = $pollModel->where('vote_id', $vote['id'])->findAll();
+
+        $totalVotes = array_sum(array_column($poll, 'vote_count'));
+
+        $pollWithPercentages = [];
+
+        foreach ($poll as $pollItem) {
+            $voteCount = (int) $pollItem['vote_count'];
+            $percentage = $totalVotes > 0 ? ($voteCount / $totalVotes) * 100 : 0;
+
+            $pollItem['percent'] = round($percentage, 2);
+
+            $pollWithPercentages[] = $pollItem;
+        }
+
+        $data = [
+            'poll'       => $pollWithPercentages,
+            'poll_title' => $vote['title'],
+            'poll_desc'  => $vote['description']
+        ];
+
+        return $this->view('vote/result', $data);
+    }
 }
